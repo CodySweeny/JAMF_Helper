@@ -1,0 +1,42 @@
+#!/bin/bash
+#Cody Sweeny
+#12/31/2020
+#Office Nag
+ls /Library/Application\ Support/JAMF/Waiting\ Room/ | grep ".pkg" > /dev/null
+if [ "$?" == "0" ]; then
+echo "PKG files exists."
+	OfficeUpdate=`/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper \
+-windowType "utility" \
+-lockHUD \
+-title "Microsoft Office Update Required" \
+-heading "We need to do some updates" \
+-description "A new version of Microsoft Office has been downloaded to your machine and is pending install. Please close any Office products and select Update Now. This will also install any pending OS Updates" \
+-icon "/Users/User/Public/brandingimage.png" \
+-iconSize 120 \
+-button1 "Update Now" \
+-defaultButton 1 \
+-button2 "Cancel" \
+-alignCountdown "right"`
+	if [ $OfficeUpdate == 0 ]; then
+	    echo "Update was pressed!"
+	    sleep 3
+		ThankYou=`/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper \
+		-windowType "utility" \
+		-lockHUD \
+		-title "Thank you" \
+		-heading "Office Update Intiated" \
+		-description "Office products will be available in 5-10 minutes. Thank you!" \
+		-icon "/Users/User/Public/brandingimage.png" \
+		-iconSize 120 \
+		-button1 "Okay" \
+		-defaultButton 1 \
+		-alignCountdown "right"`
+		sudo jamf policy -trigger InstallCached
+			elif [ $OfficeUpdate == 2 ]; then
+			    echo "Cancel was pressed!"
+			fi
+
+			exit 0
+else
+	echo "Package doesn't exist."
+fi
